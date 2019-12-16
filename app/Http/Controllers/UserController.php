@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ReceivingSheet;
+use App\Record;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -236,6 +236,56 @@ class UserController extends Controller
 
     public function deleteUser($id)
     {
+        $user = User::findOrFail($id);
+        $user->delete($id);
 
+        $records = Record::query()
+            ->where('patient_id', null)
+            ->get();
+
+        foreach ($records as $record) {
+            $record->update([
+                'is_reserved' => 0,
+            ]);
+        }
+
+        $status = '204';
+        return response()->json($status);
+    }
+
+    public function authorization(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        $user = User::query()
+            ->where('email', $credentials['email'])
+            ->get()->first();
+
+        if (!is_null($user)) {
+            if (password_verify($credentials['password'], $user->password)) {
+                $user->update([
+                    'token' => uniqid(),
+                ]);
+                return response()->json([
+                    'message' => 'Authorised',
+                    'token' => $user->token,
+                    'fio' => $user->fio,
+                    'status' => '200',
+                ]);
+
+            } else {
+                return response()->json([
+                    'message' => 'You cannot sign with those credentials',
+                    'errors' => 'Unauthorised',
+                    'status' => '401',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'message' => 'No such user',
+                'errors' => 'Wrong email',
+                'status' => '401',
+            ]);
+        }
     }
 }

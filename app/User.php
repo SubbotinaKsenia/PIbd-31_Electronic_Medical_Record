@@ -33,13 +33,23 @@ class User extends Authenticatable
         'token',
     ];
 
-    public function records()
+    public function recordsDoctor()
     {
-        return $this->hasMany(Record::class);
+        return $this->hasMany(Record::class, 'doctor_id', 'id');
     }
 
-    public function receivingsheets()
+    public function recordsPatient()
     {
-        return $this->hasMany(ReceivingSheet::class);
+        return $this->hasMany(Record::class, 'patient_id', 'id');
+    }
+
+    public function receivingsheetsDoctor()
+    {
+        return $this->hasMany(ReceivingSheet::class, 'doctor_id', 'id');
+    }
+
+    public function receivingsheetsPatient()
+    {
+        return $this->hasMany(ReceivingSheet::class, 'patient_id', 'id');
     }
 }

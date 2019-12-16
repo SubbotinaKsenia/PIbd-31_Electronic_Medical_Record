@@ -21,7 +21,7 @@ class CreateRecordsTable extends Migration
             $table->dateTime('date');
             $table->boolean('is_reserved');
             $table->foreign('doctor_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('patient_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('patient_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });

@@ -52,3 +52,4 @@ Route::post('/addAdmin', 'UserController@addAdmin');
 Route::put('/updateById/{id}', 'UserController@updateById');
 Route::put('/updateByToken/{token}', 'UserController@updateByToken');
 Route::delete('/deleteUser/{id}', 'UserController@deleteUser');
+Route::post('/authorization', 'UserController@authorization');
