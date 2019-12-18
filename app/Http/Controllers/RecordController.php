@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Record;
+use App\Service;
 use App\User;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class RecordController extends Controller
@@ -159,6 +161,8 @@ class RecordController extends Controller
     {
         $user = User::where('token', $token)->get()->first();
         $record = Record::findOrFail($id);
+        $doctor = User::findOrFail($record->doctor_id);
+        $service = Service::findOrFail($record->service_id);
 
         if (!is_null($user)) {
             $record->update([
@@ -171,6 +175,13 @@ class RecordController extends Controller
             $status = '422';
             $list = "User not found";
         }
+
+        Mail::send([], [], function ($message) use ($user, $record, $doctor, $service) {
+            $message->to($user->email, $user->fio)
+                ->subject('Запись на прием')
+                ->from(env('MAIL_USERNAME'), 'MedCenter')
+                ->setBody("Здравствуйте, " . $user->fio . "!\nВы записаны на прием.\n\nДоктор: " . $doctor->fio . "\nУслуга: " . $service->title . "\nСтоимость: " . $service->price . "\nДата: " . strval(date('Y-m-d', strtotime($record->date))) . "\nВремя: " . strval(date('H:i', strtotime($record->date))) . "\n\nС уважением, Медицинский Центр");
+        });
 
         $data = compact('list', 'status');
 
@@ -198,6 +209,7 @@ class RecordController extends Controller
         $records = Record::query()
             ->where('service_id', $service_id)
             ->where('doctor_id', $doctor_id)
+            ->where('is_reserved', 0)
             ->get();
 
         $list = $records;

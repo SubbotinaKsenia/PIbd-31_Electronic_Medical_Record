@@ -41,7 +41,7 @@ class ReceivingSheetController extends Controller
 
     public function getReceivingSheet($id)
     {
-        $list = ReceivingSheet::with(['symptoms', 'diseases', 'drugs'])->get();
+        $list = ReceivingSheet::with(['symptoms', 'diseases', 'drugs'])->find($id);
         $status = $list ? '200' : '404';
         $data = compact('list', 'status');
 
@@ -60,7 +60,7 @@ class ReceivingSheetController extends Controller
 
         if (!is_null($user)) {
             if ($validator->passes()) {
-                $receivingsheet = ReceivingSheet::create([
+                $receiving_sheet = ReceivingSheet::create([
                     'doctor_id' => $user->id,
                     'patient_id' => $request->input('patient_id'),
                     'date' => date_format(new DateTime("now", new DateTimeZone('Europe/Ulyanovsk')), 'Y-m-d H:i'),
@@ -70,51 +70,51 @@ class ReceivingSheetController extends Controller
 
                 $symptoms = $request->input('symptoms');
                 foreach ($symptoms as $symptom) {
-                    \App::call('App\Http\Controllers\SymptomController@addSymptomToReceivingSheet', ['sheet_id' => $receivingsheet->id, 'symptom_id' => $symptom]);
+                    \App::call('App\Http\Controllers\SymptomController@addSymptomToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'symptom_id' => $symptom]);
                 }
                 $drugs = $request->input('drugs');
                 foreach ($drugs as $drug) {
-                    \App::call('App\Http\Controllers\DrugController@addDrugToReceivingSheet', ['sheet_id' => $receivingsheet->id, 'drug_id' => $drug]);
+                    \App::call('App\Http\Controllers\DrugController@addDrugToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'drug_id' => $drug]);
                 }
                 $diseases = $request->input('diseases');
                 foreach ($diseases as $disease) {
-                    \App::call('App\Http\Controllers\DiseaseController@addDiseaseToReceivingSheet', ['sheet_id' => $receivingsheet->id, 'disease_id' => $disease]);
+                    \App::call('App\Http\Controllers\DiseaseController@addDiseaseToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'disease_id' => $disease]);
                 }
 
                 $status = '201';
             } else {
                 $status = '422';
-                $receivingsheet = $validator->errors();
+                $receiving_sheet = $validator->errors();
             }
         } else {
             $status = '422';
-            $receivingsheet = "Doctor not found";
+            $receiving_sheet = "Doctor not found";
         }
-        $data = compact('receivingsheet', 'status');
+        $data = compact('receiving_sheet', 'status');
 
         return response()->json($data);
     }
 
     public function updateReceivingSheet(Request $request, $id)
     {
-        $receivingsheet = ReceivingSheet::findOrFail($id);
+        $receiving_sheet = ReceivingSheet::findOrFail($id);
 
-        $receivingsheet->update([
-            'doctor_id' => $receivingsheet->doctor_id,
-            'patient_id' => $request->input('patient_id') ? $request->input('patient_id') : $receivingsheet->patient_id,
-            'date' => $receivingsheet->date,
+        $receiving_sheet->update([
+            'doctor_id' => $receiving_sheet->doctor_id,
+            'patient_id' => $request->input('patient_id') ? $request->input('patient_id') : $receiving_sheet->patient_id,
+            'date' => $receiving_sheet->date,
             'description' => $request->input('description'),
         ]);
         $status = '201';
-        $data = compact('receivingsheet', 'status');
+        $data = compact('receiving_sheet', 'status');
 
         return response()->json($data);
     }
 
     public function deleteReceivingSheet($id)
     {
-        $receivingsheet = ReceivingSheet::findOrFail($id);
-        $receivingsheet->delete($id);
+        $receiving_sheet = ReceivingSheet::findOrFail($id);
+        $receiving_sheet->delete($id);
         $status = '204';
 
         return response()->json($status);

@@ -327,4 +327,23 @@ class UserController extends Controller
 
         return response()->json($data);
     }
+
+    public function getPatientsFromRecordsByDoctor($token)
+    {
+        $user = User::where('token', $token)->get()->first();
+        $records = Record::where('doctor_id', $user->id)->get();
+
+        $patients = array();
+        foreach ($records as $record) {
+            $patient = User::findOrFail($record->patient_id);
+            if (!in_array($patient, $patients)) {
+                array_push($patients, $patient);
+            }
+        }
+        $list = $patients;
+        $status = $list ? '200' : '404';
+        $data = compact('list', 'status');
+
+        return response()->json($data);
+    }
 }
