@@ -9,67 +9,46 @@ use App\ServiceReport;
 use App\User;
 use App\Service;
 use Illuminate\Http\Request;
+use PhpOffice\PhpWord\SimpleType\Jc;
 
 class ReportController extends Controller
 {
-    public function report()
-    {
-        $phpWord = new  \PhpOffice\PhpWord\PhpWord();
-        $phpWord->setDefaultFontSize(14);
-//        $properties = $phpWord->getDocInfo();
-//        $properties->setCreator('Name');
-//        $properties->setCompany('Company');
-//        $properties->setTitle('Title');
-//        $properties->setDescription('Description');
-//        $properties->setCategory('My category');
-//        $properties->setLastModifiedBy('My name');
-//        $properties->setCreated(mktime(0, 0, 0, 3, 12, 2015));
-//        $properties->setModified(mktime(0, 0, 0, 3, 14, 2015));
-//        $properties->setSubject('My subject');
-//        $properties->setKeywords('my, key, word');
-        $section = $phpWord->addSection();
-        //$text = $section->addTable()
-        $text = $section->addText("dfsfsfsfs");
-        //$text = $section->addText($request->get('emp_salary'));
-        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save('testik.docx');
-        return response()->download(public_path('testik.docx'));
-    }
-
     public function getReportTopDoctors()
     {
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
+        $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
+        $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
+        $phpWord->addFontStyle('FontCell', array('name' => 'Times New Roman', 'size' => 14, 'bold' => false));
+        $phpWord->addParagraphStyle('Paragraph', array('alignment' => Jc::CENTER));
+
         $section = $phpWord->addSection();
-        $header = array(
-            'size' => 14,
-            'bold' => true,
-            'align' => 'center',
-        );
 
         $docs = \App::call('App\Http\Controllers\ReportController@ReportTopDoctors');
 
-        $section->addTextBreak(1);
-        $section->addText(htmlspecialchars('Рейтинг врачей за период'), $header);
+        $section->addText(htmlspecialchars('Рейтинг врачей за период'), 'FontHeader', 'Paragraph');
+
         $styleTable = array('borderSize' => 6, 'borderColor' => '006699', 'cellMargin' => 100);
-        $styleFirstRow = array('borderBottomSize' => 18);
-        $styleCell = array('align' => 'center');
-        $fontStyle = array('bold' => true, 'align' => 'center');
+        $styleFirstRow = array('borderBottomSize' => 15);
+
         $phpWord->addTableStyle('Рейтинг врачей за период', $styleTable, $styleFirstRow);
         $table = $section->addTable('Рейтинг врачей за период');
-        $table->addRow(500);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('№'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Доктор'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Кол-во записей к врачу'), $fontStyle);
+
+        $table->addRow();
+        $table->addCell(750)->addText(htmlspecialchars('№'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Доктор'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Кол-во записей'), 'Font', 'Paragraph');
         $i = 1;
         foreach ($docs as $doc) {
             $table->addRow();
-            $table->addCell(2000)->addText(htmlspecialchars("{$i}."));
-            $table->addCell(2000)->addText(htmlspecialchars("{$doc->fio}"));
-            $table->addCell(2000)->addText(htmlspecialchars("{$doc->count}"));
+            $table->addCell(750)->addText(htmlspecialchars("{$i}."), 'FontCell', 'Paragraph');
+            $table->addCell(5000)->addText(htmlspecialchars("{$doc->fio}"), 'FontCell');
+            $table->addCell(5000)->addText(htmlspecialchars("{$doc->count}"), 'FontCell');
             $i++;
         }
+
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save('Рейтинг врачей за период.docx');
+
         return response()->download(public_path('Рейтинг врачей за период.docx'));
     }
 
@@ -77,75 +56,78 @@ class ReportController extends Controller
     public function getReportTopServices()
     {
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
+        $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
+        $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
+        $phpWord->addFontStyle('FontCell', array('name' => 'Times New Roman', 'size' => 14, 'bold' => false));
+        $phpWord->addParagraphStyle('Paragraph', array('alignment' => Jc::CENTER));
+
         $section = $phpWord->addSection();
-        $header = array(
-            'size' => 14,
-            'bold' => true,
-            'align' => 'center',
-        );
 
         $top_services = \App::call('App\Http\Controllers\ReportController@ReportTopServices');
-        $section->addTextBreak(1);
-        $section->addText(htmlspecialchars('Рейтинг услуг за период'), $header);
+
+        $section->addText(htmlspecialchars('Рейтинг услуг за период'), 'FontHeader', 'Paragraph');
+
         $styleTable = array('borderSize' => 6, 'borderColor' => '006699', 'cellMargin' => 100);
-        $styleFirstRow = array('borderBottomSize' => 18);
-        $styleCell = array('align' => 'center');
-        $fontStyle = array('bold' => true, 'align' => 'center');
+        $styleFirstRow = array('borderBottomSize' => 15);
+
         $phpWord->addTableStyle('Рейтинг услуг за период', $styleTable, $styleFirstRow);
         $table = $section->addTable('Рейтинг услуг за период');
-        $table->addRow(500);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('№'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Услуга'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Кол-во записей на услугу'), $fontStyle);
+
+        $table->addRow();
+        $table->addCell(750)->addText(htmlspecialchars('№'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Услуга'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Кол-во записей'), 'Font', 'Paragraph');
         $i = 1;
         foreach ($top_services as $top_service) {
             $table->addRow();
-            $table->addCell(2000)->addText(htmlspecialchars("{$i}."));
-            $table->addCell(2000)->addText(htmlspecialchars("{$top_service->title}"));
-            $table->addCell(2000)->addText(htmlspecialchars("{$top_service->count}"));
+            $table->addCell(750)->addText(htmlspecialchars("{$i}."), 'FontCell', 'Paragraph');
+            $table->addCell(5000)->addText(htmlspecialchars("{$top_service->title}"), 'FontCell');
+            $table->addCell(5000)->addText(htmlspecialchars("{$top_service->count}"), 'FontCell');
             $i++;
         }
 
-
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save('Рейтинг услуг за период.docx');
+
         return response()->download(public_path('Рейтинг услуг за период.docx'));
     }
 
     public function getReportTopPatients()
     {
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
+        $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
+        $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
+        $phpWord->addFontStyle('FontCell', array('name' => 'Times New Roman', 'size' => 14, 'bold' => false));
+        $phpWord->addParagraphStyle('Paragraph', array('alignment' => Jc::CENTER));
+
         $section = $phpWord->addSection();
-        $header = array(
-            'size' => 14,
-            'bold' => true,
-            'align' => 'center',
-        );
 
         $top_patients = \App::call('App\Http\Controllers\ReportController@ReportTopPatients');
 
-        $section->addTextBreak(1);
-        $section->addText(htmlspecialchars(' '), $header);
+        $section->addText(htmlspecialchars('Рейтинг пациентов за период'), 'FontHeader', 'Paragraph');
+
         $styleTable = array('borderSize' => 6, 'borderColor' => '006699', 'cellMargin' => 100);
-        $styleFirstRow = array('borderBottomSize' => 18);
-        $styleCell = array('align' => 'center');
-        $fontStyle = array('bold' => true, 'align' => 'center');
+        $styleFirstRow = array('borderBottomSize' => 15);
+
         $phpWord->addTableStyle('Рейтинг пациентов за период', $styleTable, $styleFirstRow);
         $table = $section->addTable('Рейтинг пациентов за период');
-        $table->addRow(500);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('№'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Пациент'), $fontStyle);
-        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Кол-во записей на прием'), $fontStyle);
+
+        $table->addRow();
+        $table->addCell(750)->addText(htmlspecialchars('№'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Пациент'), 'Font', 'Paragraph');
+        $table->addCell(5000)->addText(htmlspecialchars('Кол-во записей'), 'Font', 'Paragraph');
         $i = 1;
         foreach ($top_patients as $top_patient) {
             $table->addRow();
-            $table->addCell(2000)->addText(htmlspecialchars("{$i}."));
-            $table->addCell(2000)->addText(htmlspecialchars("{$top_patient->fio}"));
-            $table->addCell(2000)->addText(htmlspecialchars("{$top_patient->count}"));
+            $table->addCell(750)->addText(htmlspecialchars("{$i}."), 'FontCell', 'Paragraph');
+            $table->addCell(5000)->addText(htmlspecialchars("{$top_patient->fio}"), 'FontCell');
+            $table->addCell(5000)->addText(htmlspecialchars("{$top_patient->count}"), 'FontCell');
             $i++;
         }
+
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save('Рейтинг пациентов за период.docx');
+
         return response()->download(public_path('Рейтинг пациентов за период.docx'));
     }
 
