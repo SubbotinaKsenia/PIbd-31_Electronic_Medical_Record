@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Drug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DrugController extends Controller
@@ -85,6 +86,17 @@ class DrugController extends Controller
     {
         $drug = Drug::findOrFail($id);
         $drug->delete($id);
+        $status = '204';
+
+        return response()->json($status);
+    }
+
+    public function addDrugToReceivingSheet($sheet_id, $drug_id)
+    {
+        DB::table('drug_receiving_sheet')->insert([
+            'receiving_sheet_id' => $sheet_id,
+            'drug_id' => $drug_id,
+        ]);
         $status = '204';
 
         return response()->json($status);

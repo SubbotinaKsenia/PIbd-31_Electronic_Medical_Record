@@ -13,7 +13,7 @@ class CreateReceivingsheetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('receivingsheets', function (Blueprint $table) {
+        Schema::create('receiving_sheets', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('doctor_id')->unsigned();
             $table->bigInteger('patient_id')->unsigned();
@@ -32,6 +32,6 @@ class CreateReceivingsheetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('receivingsheets');
+        Schema::dropIfExists('receiving_sheets');
     }
 }

@@ -14,6 +14,6 @@ class Service extends Model
 
     public function records()
     {
-        return $this->hasMany(Record::class, 'service_id', 'id');
+        return $this->hasMany(Record::class, 'service_id', 'id')->withTimestamps();
     }
 }

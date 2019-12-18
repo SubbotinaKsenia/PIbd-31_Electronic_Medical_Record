@@ -35,21 +35,21 @@ class User extends Authenticatable
 
     public function recordsDoctor()
     {
-        return $this->hasMany(Record::class, 'doctor_id', 'id');
+        return $this->hasMany(Record::class, 'doctor_id', 'id')->withTimestamps();
     }
 
     public function recordsPatient()
     {
-        return $this->hasMany(Record::class, 'patient_id', 'id');
+        return $this->hasMany(Record::class, 'patient_id', 'id')->withTimestamps();
     }
 
     public function receivingsheetsDoctor()
     {
-        return $this->hasMany(ReceivingSheet::class, 'doctor_id', 'id');
+        return $this->hasMany(ReceivingSheet::class, 'doctor_id', 'id')->withTimestamps();
     }
 
     public function receivingsheetsPatient()
     {
-        return $this->hasMany(ReceivingSheet::class, 'patient_id', 'id');
+        return $this->hasMany(ReceivingSheet::class, 'patient_id', 'id')->withTimestamps();
     }
 }

@@ -216,18 +216,23 @@ class UserController extends Controller
             'email' => 'Поле в формате почты',
         ]);
 
-        if ($validator->passes()) {
-            $user->update([
-                'fio' => $request->input('fio'),
-                'email' => $request->input('email'),
-                'password' => $request->input('password') ? Hash::make($request->input('password')) : $user->password,
-                'type' => $user->type,
-                'token' => $user->token,
-            ]);
-            $status = '201';
+        if (!is_null($user)) {
+            if ($validator->passes()) {
+                $user->update([
+                    'fio' => $request->input('fio'),
+                    'email' => $request->input('email'),
+                    'password' => $request->input('password') ? Hash::make($request->input('password')) : $user->password,
+                    'type' => $user->type,
+                    'token' => $user->token,
+                ]);
+                $status = '201';
+            } else {
+                $status = '422';
+                $user = $validator->errors();
+            }
         } else {
             $status = '422';
-            $user = $validator->errors();
+            $user = "User not found";
         }
         $data = compact('user', 'status');
 
@@ -276,16 +281,50 @@ class UserController extends Controller
             } else {
                 return response()->json([
                     'message' => 'You cannot sign with those credentials',
-                    'errors' => 'Unauthorised',
                     'status' => '401',
                 ]);
             }
         } else {
             return response()->json([
-                'message' => 'No such user',
-                'errors' => 'Wrong email',
+                'message' => 'User not found',
                 'status' => '401',
             ]);
         }
+    }
+
+    public function logout($token)
+    {
+        $user = User::where('token', $token)->get()->first();
+        if (!is_null($user)) {
+            $user->update([
+                'token' => null,
+            ]);
+            return response()->json([
+                'message' => 'Logout is complete',
+                'status' => '200',
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'User not found',
+                'status' => '401',
+            ]);
+        }
+    }
+
+    public function getDoctorsFromRecordsByService($service_id)
+    {
+        $records = Record::where('service_id', $service_id)->get();
+        $doctors = array();
+        foreach ($records as $record) {
+            $doctor = User::findOrFail($record->doctor_id);
+            if (!in_array($doctor, $doctors)) {
+                array_push($doctors, $doctor);
+            }
+        }
+        $list = $doctors;
+        $status = $list ? '200' : '404';
+        $data = compact('list', 'status');
+
+        return response()->json($data);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Record;
 use App\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -90,5 +91,23 @@ class ServiceController extends Controller
         $status = '204';
 
         return response()->json($status);
+    }
+
+    public function getServicesFromRecords()
+    {
+        $records = Record::all();
+        $services = array();
+        foreach ($records as $record) {
+            $service = Service::findOrFail($record->service_id);
+            if (!in_array($service, $services)) {
+                array_push($services, $service);
+            }
+        }
+        $list = $services;
+
+        $status = $list ? '200' : '404';
+        $data = compact('services', 'status');
+
+        return response()->json($data);
     }
 }

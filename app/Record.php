@@ -16,16 +16,16 @@ class Record extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(User::class, 'doctor_id', 'id');
+        return $this->belongsTo(User::class, 'doctor_id', 'id')->withTimestamps();
     }
 
     public function patient()
     {
-        return $this->belongsTo(User::class, 'patient_id', 'id');
+        return $this->belongsTo(User::class, 'patient_id', 'id')->withTimestamps();
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class, 'service_id', 'id');
+        return $this->belongsTo(Service::class, 'service_id', 'id')->withTimestamps();
     }
 }

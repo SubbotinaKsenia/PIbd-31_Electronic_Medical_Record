@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Symptom;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SymptomController extends Controller
@@ -83,6 +84,17 @@ class SymptomController extends Controller
     {
         $symptom = Symptom::findOrFail($id);
         $symptom->delete($id);
+        $status = '204';
+
+        return response()->json($status);
+    }
+
+    public function addSymptomToReceivingSheet($sheet_id, $symptom_id)
+    {
+        DB::table('receiving_sheet_symptom')->insert([
+            'receiving_sheet_id' => $sheet_id,
+            'symptom_id' => $symptom_id,
+        ]);
         $status = '204';
 
         return response()->json($status);

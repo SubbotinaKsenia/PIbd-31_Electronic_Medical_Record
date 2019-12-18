@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Disease;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DiseaseController extends Controller
@@ -83,6 +84,17 @@ class DiseaseController extends Controller
     {
         $disease = Disease::findOrFail($id);
         $disease->delete($id);
+        $status = '204';
+
+        return response()->json($status);
+    }
+
+    public function addDiseaseToReceivingSheet($sheet_id, $disease_id)
+    {
+        DB::table('disease_receiving_sheet')->insert([
+            'receiving_sheet_id' => $sheet_id,
+            'disease_id' => $disease_id,
+        ]);
         $status = '204';
 
         return response()->json($status);

@@ -13,9 +13,9 @@ class CreateDiseaseSheetTable extends Migration
      */
     public function up()
     {
-        Schema::create('disease_sheet', function (Blueprint $table) {
-            $table->bigInteger('sheet_id')->unsigned()->nullable();
-            $table->foreign('sheet_id')->references('id')->on('receivingsheets')->onDelete('cascade');
+        Schema::create('disease_receiving_sheet', function (Blueprint $table) {
+            $table->bigInteger('receiving_sheet_id')->unsigned()->nullable();
+            $table->foreign('receiving_sheet_id')->references('id')->on('receiving_sheets')->onDelete('cascade');
             $table->bigInteger('disease_id')->unsigned()->nullable();
             $table->foreign('disease_id')->references('id')->on('diseases')->onDelete('cascade');
             $table->timestamps();
@@ -29,6 +29,6 @@ class CreateDiseaseSheetTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('disease_sheet');
+        Schema::dropIfExists('disease_receiving_sheet');
     }
 }
