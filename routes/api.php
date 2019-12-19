@@ -76,9 +76,11 @@ Route::post('/addReceivingSheet/{token}', 'ReceivingSheetController@addReceiving
 Route::put('/updateReceivingSheet/{id}', 'ReceivingSheetController@updateReceivingSheet');
 Route::delete('/deleteReceivingSheet/{id}', 'ReceivingSheetController@deleteReceivingSheet');
 
-Route::get('/ReportTopDoctors', 'ReportController@ReportTopDoctors');
-Route::get('/ReportTopServices', 'ReportController@ReportTopServices');
-Route::get('/ReportTopPatients', 'ReportController@ReportTopPatients');
-Route::get('/getReportTopDoctors', 'ReportController@getReportTopDoctors');
-Route::get('/getReportTopServices', 'ReportController@getReportTopServices');
-Route::get('/getReportTopPatients', 'ReportController@getReportTopPatients');
+Route::get('/ReportTopDoctors/{dateFrom}/{dateTo}', 'ReportController@ReportTopDoctors');
+Route::get('/ReportTopServices/{dateFrom}/{dateTo}', 'ReportController@ReportTopServices');
+Route::get('/ReportTopPatients/{dateFrom}/{dateTo}', 'ReportController@ReportTopPatients');
+Route::get('/ReportTopDiseases/{dateFrom}/{dateTo}', 'ReportController@ReportTopDiseases');
+Route::get('/getReportTopDoctors/{dateFrom}/{dateTo}', 'ReportController@getReportTopDoctors');
+Route::get('/getReportTopServices/{dateFrom}/{dateTo}', 'ReportController@getReportTopServices');
+Route::get('/getReportTopPatients/{dateFrom}/{dateTo}', 'ReportController@getReportTopPatients');
+Route::get('/getReportTopDiseases/{dateFrom}/{dateTo}', 'ReportController@getReportTopDiseases');
