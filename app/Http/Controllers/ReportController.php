@@ -19,7 +19,6 @@ class ReportController extends Controller
 {
     public function getReportTopDoctors($dateFrom, $dateTo)
     {
-
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
         $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
         $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
@@ -60,7 +59,6 @@ class ReportController extends Controller
 
     public function getReportTopServices($dateFrom, $dateTo)
     {
-        //dd(("2019-12-09 15:00:00" <= date('Y-m-d H:i:s', (strtotime($dateTo) + 86400))));
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
         $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
         $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));

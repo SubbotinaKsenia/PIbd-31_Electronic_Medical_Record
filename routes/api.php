@@ -50,20 +50,20 @@ Route::post('/addDoctor', 'UserController@addDoctor');
 Route::post('/addPatient', 'UserController@addPatient');
 Route::post('/addAdmin', 'UserController@addAdmin');
 Route::put('/updateById/{id}', 'UserController@updateById');
-Route::put('/updateByToken/{token}', 'UserController@updateByToken');
+Route::put('/updateByToken', 'UserController@updateByToken');
 Route::delete('/deleteUser/{id}', 'UserController@deleteUser');
 Route::post('/authorization', 'UserController@authorization');
-Route::get('/logout/{token}', 'UserController@logout');
+Route::get('/logout', 'UserController@logout');
 Route::get('/getDoctorsFromRecordsByService/{service_id}', 'UserController@getDoctorsFromRecordsByService');
-Route::get('/getPatientsFromRecordsByDoctor/{token}', 'UserController@getPatientsFromRecordsByDoctor');
+Route::get('/getPatientsFromRecordsByDoctor', 'UserController@getPatientsFromRecordsByDoctor');
 
 Route::get('/getRecords', 'RecordController@getRecords');
 Route::get('/getRecordsByDoctor/{id}', 'RecordController@getRecordsByDoctor');
-Route::get('/getRecordsByPatient/{token}', 'RecordController@getRecordsByPatient');
+Route::get('/getRecordsByPatient', 'RecordController@getRecordsByPatient');
 Route::get('/getRecord/{id}', 'RecordController@getRecord');
 Route::post('/addRecord', 'RecordController@addRecord');
 Route::put('/updateRecord/{id}', 'RecordController@updateRecord');
-Route::put('/addReservation/{token}/{id}', 'RecordController@addReservation');
+Route::put('/addReservation/{id}', 'RecordController@addReservation');
 Route::delete('/deleteRecord/{id}', 'RecordController@deleteRecord');
 Route::put('/deleteReservation/{id}', 'RecordController@deleteReservation');
 Route::get('/getRecordByServiceAndDoctor/{service_id}/{doctor_id}', 'RecordController@getRecordByServiceAndDoctor');
@@ -72,7 +72,7 @@ Route::get('/getReceivingSheets', 'ReceivingSheetController@getReceivingSheets')
 Route::get('/getReceivingSheetsByDoctor/{id}', 'ReceivingSheetController@getReceivingSheetsByDoctor');
 Route::get('/getReceivingSheetsByPatient/{id}', 'ReceivingSheetController@getReceivingSheetsByPatient');
 Route::get('/getReceivingSheet/{id}', 'ReceivingSheetController@getReceivingSheet');
-Route::post('/addReceivingSheet/{token}', 'ReceivingSheetController@addReceivingSheet');
+Route::post('/addReceivingSheet', 'ReceivingSheetController@addReceivingSheet');
 Route::put('/updateReceivingSheet/{id}', 'ReceivingSheetController@updateReceivingSheet');
 Route::delete('/deleteReceivingSheet/{id}', 'ReceivingSheetController@deleteReceivingSheet');
 

@@ -31,8 +31,9 @@ class RecordController extends Controller
         return response()->json($data);
     }
 
-    public function getRecordsByPatient($token)
+    public function getRecordsByPatient(Request $request)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
         $list = Record::where('patient_id', $user->id)->get();
         $status = $list ? '200' : '404';
@@ -157,8 +158,9 @@ class RecordController extends Controller
         return response()->json($status);
     }
 
-    public function addReservation($token, $id)
+    public function addReservation(Request $request, $id)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
         $record = Record::findOrFail($id);
         $doctor = User::findOrFail($record->doctor_id);

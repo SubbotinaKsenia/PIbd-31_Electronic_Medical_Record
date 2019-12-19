@@ -201,8 +201,9 @@ class UserController extends Controller
         return response()->json($data);
     }
 
-    public function updateByToken(Request $request, $token)
+    public function updateByToken(Request $request)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
 
         $validator = Validator::make($request->all(), [
@@ -292,8 +293,9 @@ class UserController extends Controller
         }
     }
 
-    public function logout($token)
+    public function logout(Request $request)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
         if (!is_null($user)) {
             $user->update([
@@ -328,8 +330,9 @@ class UserController extends Controller
         return response()->json($data);
     }
 
-    public function getPatientsFromRecordsByDoctor($token)
+    public function getPatientsFromRecordsByDoctor(Request $request)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
         $records = Record::where('doctor_id', $user->id)->get();
 

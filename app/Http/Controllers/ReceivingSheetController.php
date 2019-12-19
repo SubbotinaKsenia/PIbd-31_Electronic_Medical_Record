@@ -48,8 +48,9 @@ class ReceivingSheetController extends Controller
         return response()->json($data);
     }
 
-    public function addReceivingSheet(Request $request, $token)
+    public function addReceivingSheet(Request $request)
     {
+        $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
 
         $validator = Validator::make($request->all(), [
