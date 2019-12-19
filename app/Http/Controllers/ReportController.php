@@ -19,6 +19,7 @@ class ReportController extends Controller
 {
     public function getReportTopDoctors($dateFrom, $dateTo)
     {
+
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
         $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
         $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
@@ -59,6 +60,7 @@ class ReportController extends Controller
 
     public function getReportTopServices($dateFrom, $dateTo)
     {
+        //dd(("2019-12-09 15:00:00" <= date('Y-m-d H:i:s', (strtotime($dateTo) + 86400))));
         $phpWord = new  \PhpOffice\PhpWord\PhpWord();
         $phpWord->addFontStyle('FontHeader', array('name' => 'Times New Roman', 'size' => 16, 'bold' => true));
         $phpWord->addFontStyle('Font', array('name' => 'Times New Roman', 'size' => 14, 'bold' => true));
@@ -184,7 +186,7 @@ class ReportController extends Controller
 
         foreach ($sheets as $sheet) {
             $doctor = User::findOrFail($sheet->doctor_id);
-            if ($sheet->date >= $dateFrom && $sheet->date <= $dateTo) {
+            if ($sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $sheet->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
                 if (!in_array($doctor, $doctors)) {
                     array_push($top_doctors, new DoctorReport([
                         'fio' => $doctor->fio,
@@ -220,7 +222,7 @@ class ReportController extends Controller
 
         foreach ($records as $rec) {
             $service = Service::findOrFail($rec->service_id);
-            if ($rec->date >= $dateFrom && $rec->date <= $dateTo) {
+            if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
                 if (!in_array($service, $services)) {
                     array_push($top_services, new ServiceReport([
                         'title' => $service->title,
@@ -256,7 +258,7 @@ class ReportController extends Controller
 
         foreach ($records as $rec) {
             $patient = User::findOrFail($rec->patient_id);
-            if ($rec->date >= $dateFrom && $rec->date <= $dateTo) {
+            if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
                 if (!in_array($patient, $patients)) {
                     array_push($top_patients, new PatientReport([
                         'fio' => $patient->fio,
@@ -292,7 +294,7 @@ class ReportController extends Controller
 
         foreach ($sheet_diseases as $sheet_disease) {
             $receiving_sheet = ReceivingSheet::findOrFail($sheet_disease->receiving_sheet_id);
-            if ($receiving_sheet->date >= $dateFrom && $receiving_sheet->date <= $dateTo) {
+            if ($receiving_sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $receiving_sheet->date < date('Y-m-d H:i:s', (strtotime($dateTo) + 86400))) {
                 $disease = Disease::findOrFail($sheet_disease->disease_id);
                 if (!in_array($disease, $diseases)) {
                     array_push($top_diseases, new DiseaseReport([
