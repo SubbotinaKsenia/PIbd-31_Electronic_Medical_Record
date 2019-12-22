@@ -60,6 +60,96 @@ class ReceivingSheetController extends Controller
         return response()->json($data);
     }
 
+    public function getReceivingSheetToPatient($id)
+    {
+        $list = ReceivingSheet::with(['symptoms', 'diseases', 'drugs'])->find($id);
+        $doc = User::findOrFail($list->doctor_id);
+        $rs = [
+            'id' => $list->id,
+            'doctor_fio' => $doc->fio,
+            'date' => $list->date,
+            'drugs' => '',
+            'symptoms' => '',
+            'diseases' => ''
+        ];
+        $k = 0;
+        foreach ($list->diseases as $disease) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases'] . ', ' . $disease->title
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $disease->title
+                ];
+            }
+            $k++;
+        }
+
+        $k = 0;
+        foreach ($list->drugs as $drug) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'] . ', ' . $drug->title,
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases']
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $drug->title,
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases']
+                ];
+            }
+            $k++;
+        }
+
+        $k = 0;
+        foreach ($list->symptoms as $symptom) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'] . ', ' . $symptom->title,
+                    'diseases' => $rs['diseases']
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'doctor_fio' => $rs['doctor_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $symptom->title,
+                    'diseases' => $rs['diseases']
+                ];
+            }
+            $k++;
+        }
+
+        $status = $rs ? '200' : '404';
+        $data = compact('rs', 'status');
+
+        return response()->json($data);
+    }
+
     public function addReceivingSheet(Request $request)
     {
         $token = $request->header('Authorization');
