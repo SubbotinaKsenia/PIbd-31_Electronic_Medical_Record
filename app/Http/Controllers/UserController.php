@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DoctorServices;
 use App\Record;
+use App\Service;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -209,7 +211,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'fio' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['string', 'min:6'],
         ], [
             'required' => 'Обязательное поле',
             'string' => 'Поле в строковом формате',
@@ -346,6 +347,50 @@ class UserController extends Controller
         $list = $patients;
         $status = $list ? '200' : '404';
         $data = compact('list', 'status');
+
+        return response()->json($data);
+    }
+
+    public function getDoctorsWithServices()
+    {
+        $doctors = array();
+        $records = Record::all();
+        $ds = array();
+
+        foreach ($records as $record) {
+            $doctor = User::findOrFail($record->doctor_id);
+            $service = Service::findOrFail($record->service_id);
+            if (!in_array($doctor, $doctors)) {
+                array_push($doctors, $doctor);
+                array_push($ds, new DoctorServices([
+                    'id' => $doctor->id,
+                    'fio' => $doctor->fio,
+                    'services' => $service->title,
+                ]));
+            } else {
+                foreach ($ds as $d) {
+                    if ($d->id == $doctor->id && strpos($d->services, $service->title) === false) {
+                        $d->fill([
+                            'services' => ($d->services) . ", " . $service->title,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $list = $ds;
+        $status = $list ? '200' : '404';
+        $data = compact('list', 'status');
+
+        return response()->json($data);
+    }
+
+    public function getUserByToken(Request $request)
+    {
+        $token = $request->header('Authorization');
+        $user = User::where('token', $token)->get()->first();
+        $status = $user ? '200' : '404';
+        $data = compact('user', 'status');
 
         return response()->json($data);
     }

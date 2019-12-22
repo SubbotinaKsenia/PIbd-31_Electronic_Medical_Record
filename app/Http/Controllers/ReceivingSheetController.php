@@ -30,11 +30,23 @@ class ReceivingSheetController extends Controller
         return response()->json($data);
     }
 
-    public function getReceivingSheetsByPatient($id)
+    public function getReceivingSheetsByPatient(Request $request)
     {
-        $list = ReceivingSheet::where('patient_id', $id)->get();
-        $status = $list ? '200' : '404';
-        $data = compact('list', 'status');
+        $token = $request->header('Authorization');
+        $user = User::where('token', $token)->get()->first();
+        $list = ReceivingSheet::where('patient_id', $user->id)->get();
+        $rs = array();
+        foreach ($list as $el) {
+            $doc = User::findOrFail($el->doctor_id);
+            array_push($rs, [
+                'id' => $el->id,
+                'doctor_fio' => $doc->fio,
+                'date' => $el->date
+            ]);
+        }
+
+        $status = $rs ? '200' : '404';
+        $data = compact('rs', 'status');
 
         return response()->json($data);
     }

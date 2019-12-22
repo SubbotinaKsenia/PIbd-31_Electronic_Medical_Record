@@ -56,6 +56,8 @@ Route::post('/authorization', 'UserController@authorization');
 Route::get('/logout', 'UserController@logout');
 Route::get('/getDoctorsFromRecordsByService/{service_id}', 'UserController@getDoctorsFromRecordsByService');
 Route::get('/getPatientsFromRecordsByDoctor', 'UserController@getPatientsFromRecordsByDoctor');
+Route::get('/getDoctorsWithServices', 'UserController@getDoctorsWithServices');
+Route::get('/getUserByToken', 'UserController@getUserByToken');
 
 Route::get('/getRecords', 'RecordController@getRecords');
 Route::get('/getRecordsByDoctor/{id}', 'RecordController@getRecordsByDoctor');
@@ -70,7 +72,7 @@ Route::get('/getRecordByServiceAndDoctor/{service_id}/{doctor_id}', 'RecordContr
 
 Route::get('/getReceivingSheets', 'ReceivingSheetController@getReceivingSheets');
 Route::get('/getReceivingSheetsByDoctor/{id}', 'ReceivingSheetController@getReceivingSheetsByDoctor');
-Route::get('/getReceivingSheetsByPatient/{id}', 'ReceivingSheetController@getReceivingSheetsByPatient');
+Route::get('/getReceivingSheetsByPatient', 'ReceivingSheetController@getReceivingSheetsByPatient');
 Route::get('/getReceivingSheet/{id}', 'ReceivingSheetController@getReceivingSheet');
 Route::post('/addReceivingSheet', 'ReceivingSheetController@addReceivingSheet');
 Route::put('/updateReceivingSheet/{id}', 'ReceivingSheetController@updateReceivingSheet');
