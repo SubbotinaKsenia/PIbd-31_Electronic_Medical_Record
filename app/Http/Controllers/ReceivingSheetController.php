@@ -21,11 +21,23 @@ class ReceivingSheetController extends Controller
         return response()->json($data);
     }
 
-    public function getReceivingSheetsByDoctor($id)
+    public function getReceivingSheetsByDoctor(Request $request)
     {
-        $list = ReceivingSheet::where('doctor_id', $id)->get();
-        $status = $list ? '200' : '404';
-        $data = compact('list', 'status');
+        $token = $request->header('Authorization');
+        $user = User::where('token', $token)->get()->first();
+        $list = ReceivingSheet::where('doctor_id', $user->id)->get();
+        $rs = array();
+        foreach ($list as $el) {
+            $pat = User::findOrFail($el->patient_id);
+            array_push($rs, [
+                'id' => $el->id,
+                'patient_fio' => $pat->fio,
+                'date' => $el->date
+            ]);
+        }
+
+        $status = $rs ? '200' : '404';
+        $data = compact('rs', 'status');
 
         return response()->json($data);
     }
@@ -68,6 +80,7 @@ class ReceivingSheetController extends Controller
             'id' => $list->id,
             'doctor_fio' => $doc->fio,
             'date' => $list->date,
+            'description' => $list->description,
             'drugs' => '',
             'symptoms' => '',
             'diseases' => ''
@@ -79,6 +92,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $rs['drugs'],
                     'symptoms' => $rs['symptoms'],
                     'diseases' => $rs['diseases'] . ', ' . $disease->title
@@ -88,6 +102,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $rs['drugs'],
                     'symptoms' => $rs['symptoms'],
                     'diseases' => $disease->title
@@ -103,6 +118,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $rs['drugs'] . ', ' . $drug->title,
                     'symptoms' => $rs['symptoms'],
                     'diseases' => $rs['diseases']
@@ -112,6 +128,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $drug->title,
                     'symptoms' => $rs['symptoms'],
                     'diseases' => $rs['diseases']
@@ -127,6 +144,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $rs['drugs'],
                     'symptoms' => $rs['symptoms'] . ', ' . $symptom->title,
                     'diseases' => $rs['diseases']
@@ -136,6 +154,7 @@ class ReceivingSheetController extends Controller
                     'id' => $rs['id'],
                     'doctor_fio' => $rs['doctor_fio'],
                     'date' => $rs['date'],
+                    'description' => $rs['description'],
                     'drugs' => $rs['drugs'],
                     'symptoms' => $symptom->title,
                     'diseases' => $rs['diseases']
@@ -147,6 +166,99 @@ class ReceivingSheetController extends Controller
         $status = $rs ? '200' : '404';
         $data = compact('rs', 'status');
 
+        return response()->json($data);
+    }
+
+    public function getReceivingSheetToDoc($id)
+    {
+        $list = ReceivingSheet::with(['symptoms', 'diseases', 'drugs'])->find($id);
+        $pat = User::findOrFail($list->patient_id);
+        $rs = [
+            'id' => $list->id,
+            'patient_fio' => $pat->fio,
+            'date' => $list->date,
+            'drugs' => '',
+            'symptoms' => '',
+            'diseases' => '',
+            'description' => $list->description
+        ];
+        $k = 0;
+        foreach ($list->diseases as $disease) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases'] . ', ' . $disease->title,
+                    'description' => $rs['description']
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $disease->title,
+                    'description' => $rs['description']
+                ];
+            }
+            $k++;
+        }
+        $k = 0;
+        foreach ($list->drugs as $drug) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'] . ', ' . $drug->title,
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases'],
+                    'description' => $rs['description']
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $drug->title,
+                    'symptoms' => $rs['symptoms'],
+                    'diseases' => $rs['diseases'],
+                    'description' => $rs['description']
+                ];
+            }
+            $k++;
+        }
+        $k = 0;
+        foreach ($list->symptoms as $symptom) {
+            if ($k != 0) {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $rs['symptoms'] . ', ' . $symptom->title,
+                    'diseases' => $rs['diseases'],
+                    'description' => $rs['description']
+                ];
+            } else {
+                $rs = [
+                    'id' => $rs['id'],
+                    'patient_fio' => $rs['patient_fio'],
+                    'date' => $rs['date'],
+                    'drugs' => $rs['drugs'],
+                    'symptoms' => $symptom->title,
+                    'diseases' => $rs['diseases'],
+                    'description' => $rs['description']
+                ];
+            }
+            $k++;
+        }
+        $status = $rs ? '200' : '404';
+        $data = compact('rs', 'status');
         return response()->json($data);
     }
 
@@ -166,22 +278,21 @@ class ReceivingSheetController extends Controller
                 $receiving_sheet = ReceivingSheet::create([
                     'doctor_id' => $user->id,
                     'patient_id' => $request->input('patient_id'),
-                    'date' => date_format(new DateTime("now", new DateTimeZone('Europe/Ulyanovsk')), 'Y-m-d H:i'),
+                    'date' => date_format(new DateTime("now", new DateTimeZone('Europe/Ulyanovsk')), 'Y-m-d H:i:s'),
                     'description' => $request->input('description'),
                 ]);
 
-
                 $symptoms = $request->input('symptoms');
                 foreach ($symptoms as $symptom) {
-                    \App::call('App\Http\Controllers\SymptomController@addSymptomToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'symptom_id' => $symptom]);
+                    \App::call('App\Http\Controllers\SymptomController@addSymptomToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'symptom_id' => $symptom['id']]);
                 }
                 $drugs = $request->input('drugs');
                 foreach ($drugs as $drug) {
-                    \App::call('App\Http\Controllers\DrugController@addDrugToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'drug_id' => $drug]);
+                    \App::call('App\Http\Controllers\DrugController@addDrugToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'drug_id' => $drug['id']]);
                 }
                 $diseases = $request->input('diseases');
                 foreach ($diseases as $disease) {
-                    \App::call('App\Http\Controllers\DiseaseController@addDiseaseToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'disease_id' => $disease]);
+                    \App::call('App\Http\Controllers\DiseaseController@addDiseaseToReceivingSheet', ['sheet_id' => $receiving_sheet->id, 'disease_id' => $disease['id']]);
                 }
 
                 $status = '201';

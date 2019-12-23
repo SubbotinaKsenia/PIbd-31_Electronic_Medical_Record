@@ -15,7 +15,20 @@ class RecordController extends Controller
 {
     public function getRecords()
     {
-        $list = Record::all();
+        $records = Record::all();
+        $list = array();
+        foreach ($records as $record){
+            $doctor = User::findOrFail($record->doctor_id);
+            $patient = User::where('id', $record->patient_id)->get()->first();
+            $service = Service::findOrFail($record->service_id);
+            array_push($list, [
+                'id' => $record->id,
+                'doctor_fio' => $doctor->fio,
+                'patient_fio' => $patient ? $patient->fio : null,
+                'service_title' => $service->title,
+                'date' => $record->date,
+            ]);
+        }
         $status = $list ? '200' : '404';
         $data = compact('list', 'status');
 
@@ -36,8 +49,23 @@ class RecordController extends Controller
         $token = $request->header('Authorization');
         $user = User::where('token', $token)->get()->first();
         $list = Record::where('patient_id', $user->id)->get();
-        $status = $list ? '200' : '404';
-        $data = compact('list', 'status');
+
+        $records = array();
+        foreach ($list as $record) {
+            $service = Service::findOrFail($record->service_id);
+            $doctor = User::findOrFail($record->doctor_id);
+            array_push($records, [
+                'id' => $record->id,
+                'doctor_fio' => $doctor->fio,
+                'service_title' => $service->title,
+                'doctor_id' => $doctor->id,
+                'service_id' => $service->id,
+                'date' => $record->date,
+            ]);
+        }
+
+        $status = $records ? '200' : '404';
+        $data = compact('records', 'status');
 
         return response()->json($data);
     }
@@ -79,7 +107,7 @@ class RecordController extends Controller
                 $record = Record::create([
                     'service_id' => $request->input('service_id'),
                     'doctor_id' => $request->input('doctor_id'),
-                    'date' => $request->input('date'),
+                    'date' => date('Y-m-d H:i:s', strtotime($request->input('date'))),
                     'patient_id' => null,
                     'is_reserved' => 0,
                 ]);
@@ -129,7 +157,7 @@ class RecordController extends Controller
                 $record->update([
                     'service_id' => $request->input('service_id'),
                     'doctor_id' => $request->input('doctor_id'),
-                    'date' => $request->input('date'),
+                    'date' => date('Y-m-d H:i:s', strtotime($request->input('date'))),
                     'patient_id' => $record->patient_id,
                     'is_reserved' => $record->is_reserved,
                 ]);

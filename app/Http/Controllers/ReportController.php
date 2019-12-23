@@ -144,8 +144,8 @@ class ReportController extends Controller
         $phpWord->addParagraphStyle('Paragraph', array('alignment' => Jc::CENTER));
 
         $section = $phpWord->addSection();
-
         $top_diseases = \App::call('App\Http\Controllers\ReportController@ReportTopDiseases', ['dateFrom' => $dateFrom, 'dateTo' => $dateTo]);
+
 
         $section->addText(htmlspecialchars('Заболевания за период c ' . strval(date('d.m.Y', strtotime($dateFrom))) . ' по ' . strval(date('d.m.Y', strtotime($dateTo)))), 'FontHeader', 'Paragraph');
 

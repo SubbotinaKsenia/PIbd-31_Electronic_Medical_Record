@@ -71,10 +71,11 @@ Route::put('/deleteReservation/{id}', 'RecordController@deleteReservation');
 Route::get('/getRecordByServiceAndDoctor/{service_id}/{doctor_id}', 'RecordController@getRecordByServiceAndDoctor');
 
 Route::get('/getReceivingSheets', 'ReceivingSheetController@getReceivingSheets');
-Route::get('/getReceivingSheetsByDoctor/{id}', 'ReceivingSheetController@getReceivingSheetsByDoctor');
+Route::get('/getReceivingSheetsByDoctor', 'ReceivingSheetController@getReceivingSheetsByDoctor');
 Route::get('/getReceivingSheetsByPatient', 'ReceivingSheetController@getReceivingSheetsByPatient');
 Route::get('/getReceivingSheet/{id}', 'ReceivingSheetController@getReceivingSheet');
 Route::get('/getReceivingSheetToPatient/{id}', 'ReceivingSheetController@getReceivingSheetToPatient');
+Route::get('/getReceivingSheetToDoc/{id}', 'ReceivingSheetController@getReceivingSheetToDoc');
 Route::post('/addReceivingSheet', 'ReceivingSheetController@addReceivingSheet');
 Route::put('/updateReceivingSheet/{id}', 'ReceivingSheetController@updateReceivingSheet');
 Route::delete('/deleteReceivingSheet/{id}', 'ReceivingSheetController@deleteReceivingSheet');
