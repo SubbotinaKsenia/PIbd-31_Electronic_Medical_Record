@@ -219,7 +219,7 @@ class ReportController extends Controller
 
     public function ReportTopServices($dateFrom, $dateTo)
     {
-        $records = Record::all();
+        $records = Record::where('is_reserved', 1)->get();
 
         $services = array();
         $top_services = array();
