@@ -31,9 +31,7 @@ class DrugController extends Controller
     public function addDrug(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'fio' => 'required',
-            'email' => 'required',
-
+            'title' => 'required',
         ], [
             'required' => 'Обязательное поле',
         ]);
