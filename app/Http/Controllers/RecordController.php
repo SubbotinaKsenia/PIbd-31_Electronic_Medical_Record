@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Record;
 use App\Service;
 use App\User;
-use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -35,11 +33,28 @@ class RecordController extends Controller
         return response()->json($data);
     }
 
-    public function getRecordsByDoctor($id)
+    public function getRecordsByDoctor(Request $request)
     {
-        $list = Record::where('doctor_id', $id)->get();
-        $status = $list ? '200' : '404';
-        $data = compact('list', 'status');
+        $token = $request->header('Authorization');
+        $user = User::where('token', $token)->get()->first();
+        $list = Record::where('doctor_id', $user->id)->get();
+
+        $records = array();
+        foreach ($list as $record) {
+            $service = Service::findOrFail($record->service_id);
+            $patient = User::findOrFail($record->patient_id);
+            array_push($records, [
+                'id' => $record->id,
+                'patient_fio' => $patient->fio,
+                'service_title' => $service->title,
+                'patient_id' => $patient->id,
+                'service_id' => $service->id,
+                'date' => $record->date,
+            ]);
+        }
+
+        $status = $records ? '200' : '404';
+        $data = compact('records', 'status');
 
         return response()->json($data);
     }
@@ -147,7 +162,6 @@ class RecordController extends Controller
         $validator = Validator::make($request->all(), [
             'service_id' => 'required',
             'doctor_id' => 'required',
-            'date' => 'required',
         ], [
             'required' => 'Обязательное поле',
         ]);
@@ -157,7 +171,7 @@ class RecordController extends Controller
                 $record->update([
                     'service_id' => $request->input('service_id'),
                     'doctor_id' => $request->input('doctor_id'),
-                    'date' => date('Y-m-d H:i:s', strtotime($request->input('date'))),
+                    'date' => $request->input('date') ? date('Y-m-d H:i:s', strtotime($request->input('date'))) : $record->date,
                     'patient_id' => $record->patient_id,
                     'is_reserved' => $record->is_reserved,
                 ]);

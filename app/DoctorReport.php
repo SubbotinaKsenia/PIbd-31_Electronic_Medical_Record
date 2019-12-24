@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DoctorReport extends Model
 {
     protected $fillable = [
-        'fio',
+        'title',
         'count',
         'doctor_id'
     ];

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PatientReport extends Model
 {
     protected $fillable = [
-        'fio',
+        'title',
         'count',
         'patient_id'
     ];

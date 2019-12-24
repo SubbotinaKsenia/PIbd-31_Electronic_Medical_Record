@@ -339,9 +339,11 @@ class UserController extends Controller
 
         $patients = array();
         foreach ($records as $record) {
-            $patient = User::findOrFail($record->patient_id);
-            if (!in_array($patient, $patients)) {
-                array_push($patients, $patient);
+            if ($record->patient_id){
+                $patient = User::findOrFail($record->patient_id);
+                if (!in_array($patient, $patients)) {
+                    array_push($patients, $patient);
+                }
             }
         }
         $list = $patients;

@@ -60,7 +60,7 @@ Route::get('/getDoctorsWithServices', 'UserController@getDoctorsWithServices');
 Route::get('/getUserByToken', 'UserController@getUserByToken');
 
 Route::get('/getRecords', 'RecordController@getRecords');
-Route::get('/getRecordsByDoctor/{id}', 'RecordController@getRecordsByDoctor');
+Route::get('/getRecordsByDoctor', 'RecordController@getRecordsByDoctor');
 Route::get('/getRecordsByPatient', 'RecordController@getRecordsByPatient');
 Route::get('/getRecord/{id}', 'RecordController@getRecord');
 Route::post('/addRecord', 'RecordController@addRecord');

@@ -11,7 +11,6 @@ use App\Record;
 use App\ServiceReport;
 use App\User;
 use App\Service;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\SimpleType\Jc;
 
@@ -182,33 +181,40 @@ class ReportController extends Controller
         $doctors = array();
         $top_doctors = array();
 
-        foreach ($sheets as $sheet) {
-            $doctor = User::findOrFail($sheet->doctor_id);
-            if ($sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $sheet->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
-                if (!in_array($doctor, $doctors)) {
-                    array_push($top_doctors, new DoctorReport([
-                        'fio' => $doctor->fio,
-                        'count' => 1,
-                        'doctor_id' => $doctor->id,
-                    ]));
-                    array_push($doctors, $doctor);
-                } else {
-                    foreach ($top_doctors as $d) {
-                        if ($d->doctor_id == $doctor->id) {
-                            $d->fill([
-                                'count' => intval($d->count) + 1,
-                            ]);
+        if ($sheets) {
+            foreach ($sheets as $sheet) {
+                $doctor = User::findOrFail($sheet->doctor_id);
+                if ($sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $sheet->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
+                    if (!in_array($doctor, $doctors)) {
+                        array_push($top_doctors, new DoctorReport([
+                            'title' => $doctor->fio,
+                            'count' => 1,
+                            'doctor_id' => $doctor->id,
+                        ]));
+                        array_push($doctors, $doctor);
+                    } else {
+                        foreach ($top_doctors as $d) {
+                            if ($d->doctor_id == $doctor->id) {
+                                $d->fill([
+                                    'count' => intval($d->count) + 1,
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
 
-        usort($top_doctors, function ($a, $b) {
-            return ($b->count - $a->count);
-        });
+        if ($top_doctors) {
+            usort($top_doctors, function ($a, $b) {
+                return ($b->count - $a->count);
+            });
+        }
 
-        return $top_doctors;
+        $status = $top_doctors ? '200' : '404';
+        $data = compact('top_doctors', 'status');
+
+        return response()->json($data);
     }
 
     public function ReportTopServices($dateFrom, $dateTo)
@@ -218,33 +224,40 @@ class ReportController extends Controller
         $services = array();
         $top_services = array();
 
-        foreach ($records as $rec) {
-            $service = Service::findOrFail($rec->service_id);
-            if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
-                if (!in_array($service, $services)) {
-                    array_push($top_services, new ServiceReport([
-                        'title' => $service->title,
-                        'count' => 1,
-                        'service_id' => $service->id,
-                    ]));
-                    array_push($services, $service);
-                } else {
-                    foreach ($top_services as $top_service) {
-                        if ($top_service->service_id == $service->id) {
-                            $top_service->fill([
-                                'count' => intval($top_service->count) + 1
-                            ]);
+        if ($records) {
+            foreach ($records as $rec) {
+                $service = Service::findOrFail($rec->service_id);
+                if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
+                    if (!in_array($service, $services)) {
+                        array_push($top_services, new ServiceReport([
+                            'title' => $service->title,
+                            'count' => 1,
+                            'service_id' => $service->id,
+                        ]));
+                        array_push($services, $service);
+                    } else {
+                        foreach ($top_services as $top_service) {
+                            if ($top_service->service_id == $service->id) {
+                                $top_service->fill([
+                                    'count' => intval($top_service->count) + 1
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
 
-        usort($top_services, function ($a, $b) {
-            return ($b->count - $a->count);
-        });
+        if ($top_services) {
+            usort($top_services, function ($a, $b) {
+                return ($b->count - $a->count);
+            });
+        }
 
-        return $top_services;
+        $status = $top_services ? '200' : '404';
+        $data = compact('top_services', 'status');
+
+        return response()->json($data);
     }
 
     public function ReportTopPatients($dateFrom, $dateTo)
@@ -254,33 +267,40 @@ class ReportController extends Controller
         $patients = array();
         $top_patients = array();
 
-        foreach ($records as $rec) {
-            $patient = User::findOrFail($rec->patient_id);
-            if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
-                if (!in_array($patient, $patients)) {
-                    array_push($top_patients, new PatientReport([
-                        'fio' => $patient->fio,
-                        'count' => 1,
-                        'patient_id' => $patient->id,
-                    ]));
-                    array_push($patients, $patient);
-                } else {
-                    foreach ($top_patients as $top_patient) {
-                        if ($top_patient->patient_id == $patient->id) {
-                            $top_patient->fill([
-                                'count' => intval($top_patient->count) + 1
-                            ]);
+        if ($records) {
+            foreach ($records as $rec) {
+                $patient = User::findOrFail($rec->patient_id);
+                if ($rec->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $rec->date < date('Y-m-d H:i:s', strtotime($dateTo) + 86400)) {
+                    if (!in_array($patient, $patients)) {
+                        array_push($top_patients, new PatientReport([
+                            'title' => $patient->fio,
+                            'count' => 1,
+                            'patient_id' => $patient->id,
+                        ]));
+                        array_push($patients, $patient);
+                    } else {
+                        foreach ($top_patients as $top_patient) {
+                            if ($top_patient->patient_id == $patient->id) {
+                                $top_patient->fill([
+                                    'count' => intval($top_patient->count) + 1
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
 
-        usort($top_patients, function ($a, $b) {
-            return ($b->count - $a->count);
-        });
+        if ($top_patients) {
+            usort($top_patients, function ($a, $b) {
+                return ($b->count - $a->count);
+            });
+        }
 
-        return $top_patients;
+        $status = $top_patients ? '200' : '404';
+        $data = compact('top_patients', 'status');
+
+        return response()->json($data);
     }
 
     public function ReportTopDiseases($dateFrom, $dateTo)
@@ -290,33 +310,40 @@ class ReportController extends Controller
         $top_diseases = array();
         $diseases = array();
 
-        foreach ($sheet_diseases as $sheet_disease) {
-            $receiving_sheet = ReceivingSheet::findOrFail($sheet_disease->receiving_sheet_id);
-            if ($receiving_sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $receiving_sheet->date < date('Y-m-d H:i:s', (strtotime($dateTo) + 86400))) {
-                $disease = Disease::findOrFail($sheet_disease->disease_id);
-                if (!in_array($disease, $diseases)) {
-                    array_push($top_diseases, new DiseaseReport([
-                        'title' => $disease->title,
-                        'count' => 1,
-                        'disease_id' => $disease->id,
-                    ]));
-                    array_push($diseases, $disease);
-                } else {
-                    foreach ($top_diseases as $top_disease) {
-                        if ($top_disease->disease_id == $disease->id) {
-                            $top_disease->fill([
-                                'count' => intval($top_disease->count) + 1
-                            ]);
+        if ($sheet_diseases) {
+            foreach ($sheet_diseases as $sheet_disease) {
+                $receiving_sheet = ReceivingSheet::findOrFail($sheet_disease->receiving_sheet_id);
+                if ($receiving_sheet->date >= date('Y-m-d H:i:s', strtotime($dateFrom)) && $receiving_sheet->date < date('Y-m-d H:i:s', (strtotime($dateTo) + 86400))) {
+                    $disease = Disease::findOrFail($sheet_disease->disease_id);
+                    if (!in_array($disease, $diseases)) {
+                        array_push($top_diseases, new DiseaseReport([
+                            'title' => $disease->title,
+                            'count' => 1,
+                            'disease_id' => $disease->id,
+                        ]));
+                        array_push($diseases, $disease);
+                    } else {
+                        foreach ($top_diseases as $top_disease) {
+                            if ($top_disease->disease_id == $disease->id) {
+                                $top_disease->fill([
+                                    'count' => intval($top_disease->count) + 1
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
 
-        usort($top_diseases, function ($a, $b) {
-            return ($b->count - $a->count);
-        });
+        if ($top_diseases) {
+            usort($top_diseases, function ($a, $b) {
+                return ($b->count - $a->count);
+            });
+        }
 
-        return $top_diseases;
+        $status = $top_diseases ? '200' : '404';
+        $data = compact('top_diseases', 'status');
+
+        return response()->json($data);
     }
 }
