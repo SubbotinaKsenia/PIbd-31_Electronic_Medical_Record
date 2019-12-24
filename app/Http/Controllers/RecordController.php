@@ -220,12 +220,12 @@ class RecordController extends Controller
             $list = "User not found";
         }
 
-        Mail::send([], [], function ($message) use ($user, $record, $doctor, $service) {
-            $message->to($user->email, $user->fio)
-                ->subject('Запись на прием')
-                ->from(env('MAIL_USERNAME'), 'MedCenter')
-                ->setBody("Здравствуйте, " . $user->fio . "!\nВы записаны на прием.\n\nДоктор: " . $doctor->fio . "\nУслуга: " . $service->title . "\nСтоимость: " . $service->price . "\nДата: " . strval(date('Y-m-d', strtotime($record->date))) . "\nВремя: " . strval(date('H:i', strtotime($record->date))) . "\n\nС уважением, Медицинский Центр");
-        });
+//         Mail::send([], [], function ($message) use ($user, $record, $doctor, $service) {
+//             $message->to($user->email, $user->fio)
+//                 ->subject('Запись на прием')
+//                 ->from(env('MAIL_USERNAME'), 'MedCenter')
+//                 ->setBody("Здравствуйте, " . $user->fio . "!\nВы записаны на прием.\n\nДоктор: " . $doctor->fio . "\nУслуга: " . $service->title . "\nСтоимость: " . $service->price . "\nДата: " . strval(date('Y-m-d', strtotime($record->date))) . "\nВремя: " . strval(date('H:i', strtotime($record->date))) . "\n\nС уважением, Медицинский Центр");
+//         });
 
         $data = compact('list', 'status');
 
